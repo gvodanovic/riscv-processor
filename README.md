@@ -23,7 +23,7 @@ Verificar que se haya instalado correctamente:
 sudo docker version
 ```
 
-Permitir a Docker acceso al server X (GUI):
+Permitir a Docker acceso al server X (GUI). Este comando debe ser ejecutado cada vez que se inicie la PC. Se recomienda agregarlo al archivo `.bashrc`:
 
 ```bash
 sudo xhost +local:docker
@@ -156,8 +156,6 @@ Una vez finalizado se creara una carpeta `out_year-month-day` con los resultados
 cd out_year-month-day/veri-testharness_sim
 gtkwave hello_world.cv64a6_mmu.vcd
 ```
-
-Para archivos grandes puede que el programa `gtkwave` falle por falta de memoria de la maquina virtual, en dicho caso copiar el archivo `hello_world.cv64a6_mmu.vcd` a la maquina host y correr `gtkwave` desde la terminal de la misma.
 
 Si se desea correr otro test, se debe cambiar el codigo `hello_world.c`. El mismo se encuentra en la carpeta `verif/tests/custom/hello_world`. Una vez modificado el codigo, se recomieda verificar que el mismo funcione correctamente antes de correr el test en el microprocesador:
 
