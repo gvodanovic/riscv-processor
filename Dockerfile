@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     autotools-dev \
     curl \
     gtkwave \
+    nano \
     git \
     libmpc-dev \
     libmpfr-dev \

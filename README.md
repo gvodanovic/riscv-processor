@@ -54,6 +54,10 @@ Al finalizar deberia aparecer lo siguiente:
 srw-rw---- 1 root docker 0 <date> /var/run/docker.sock
 ```
 
+#### Acceder al contenido del contenedor desde VSCode
+
+Para poder acceder al contenido del contenedor desde VSCode se debe instalar la extension `Docker`.
+
 ### 2) Iniciar Docker
 
 Iniciar el servicio:
@@ -153,7 +157,18 @@ cd out_year-month-day/veri-testharness_sim
 gtkwave hello_world.cv64a6_mmu.vcd
 ```
 
-Si se desea correr otro test, se debe cambiar el codigo `hello_world.c`. El mismo se encuentra en la carpeta `verif/tests/custom`.
+Para archivos grandes puede que el programa `gtkwave` falle por falta de memoria de la maquina virtual, en dicho caso copiar el archivo `hello_world.cv64a6_mmu.vcd` a la maquina host y correr `gtkwave` desde la terminal de la misma.
+
+Si se desea correr otro test, se debe cambiar el codigo `hello_world.c`. El mismo se encuentra en la carpeta `verif/tests/custom/hello_world`. Una vez modificado el codigo, se recomieda verificar que el mismo funcione correctamente antes de correr el test en el microprocesador:
+
+```bash
+gcc -Wall -Wextra -O3 -g -std=c99 -o program hello_world.c
+./program
+```
+
+### Observaciones
+
+Tras haber probado el test `hello_world.c` con varias instrucciones de C, se observo que el procesador no soporta todas las instrucciones del lenguaje. Por ejemplo, no puede manipular numeros en punto flotante y tampoco puede realizar operaciones de memoria como `malloc` o `free`. Tampoco se ha logrado que el procesador corra por mas de 2 millones de ciclos sin que el simulador falle.
 
 ## Crear/Actualizar Imagen de Docker
 
