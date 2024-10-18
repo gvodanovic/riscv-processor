@@ -1,16 +1,16 @@
 # CVA6 RISCV-Procesor
 
-Este proyecto tiene como objetivo analizar [CVA6](https://github.com/openhwgroup/cva6), un procesador de 64 bits con arquitectura RISCV de 6 etapas desarrollado en el lenguaje de descripción de hardware **SystemVerilog**. 
+Este proyecto tiene como objetivo analizar [CVA6](https://github.com/openhwgroup/cva6), un procesador de 64 bits con arquitectura RISCV de 6 etapas desarrollado en el lenguaje de descripcion de hardware **SystemVerilog**. 
 
 ## Primeros Pasos
 
-A continuación se detallan ordenadamente los pasos necesarios para poder empezar con el proyecto. Se asume que se trabajara desde **Linux Debian**.
+A continuacion se detalla ordenadamente los pasos necesarios para poder empezar con el proyecto. Se asume que se trabajara desde un sistema operativo **Linux Debian**.
 
-En este proyecto se utiliza [Docker](https://www.docker.com/), para evitar instalar todas las dependencias necesarias de CVA6 en el sistema operativo y lograr una mayor portabilidad. Se proveerá una imagen de Docker con todas las herramientas necesarias para trabajar con el procesador.
+En este proyecto se utiliza [Docker](https://www.docker.com/), para evitar instalar todas las dependencias necesarias de CVA6 en el sistema operativo y lograr una mayor portabilidad. Se proveera una imagen de Docker con todas las herramientas necesarias para trabajar con el procesador.
 
 ### 1) Instalación de Docker
 
-Para instalar la herramienta se deben correr los siguientes comandos:
+Para instalar la herramienta se debe correr los  comandos:
 
 ```bash
 sudo apt-get update
@@ -26,12 +26,12 @@ sudo docker version
 Permitir a Docker acceso al server X (GUI). Este comando debe ser ejecutado cada vez que se inicie la PC. Se recomienda agregarlo al archivo `.bashrc`:
 
 ```bash
-sudo xhost +local:docker
+xhost +local:docker
 ```
 
-### Configuracion Opcional
+### Configuracion opcional
 
-Se recomienda realizar los siguientes pasos para facilitar el uso de la herramienta:
+Se recomienda realizar los siguientes pasos para facilitar el uso de la herramienta Docker:
 
 #### Hacer que Docker inicie automaticamente al encender la PC
 
@@ -40,6 +40,8 @@ sudo systemctl enable docker
 ```
 
 #### No tener que usar sudo para correr comandos de Docker
+
+Reemplazar `<user_name>` por el nombre de usuario de la PC (se puede obtener corriendo `whoami`).
 
 ```bash
 sudo groupadd docker
@@ -56,7 +58,7 @@ srw-rw---- 1 root docker 0 <date> /var/run/docker.sock
 
 #### Acceder al contenido del contenedor desde VSCode
 
-Para poder acceder al contenido del contenedor desde VSCode se debe instalar la extension `Docker`.
+Para poder acceder al contenido del contenedor desde VSCode se debe instalar la extension `Docker` en el apartado de `Extensions`.
 
 ### 2) Iniciar Docker
 
@@ -78,9 +80,9 @@ Para apagar el servicio correr:
 sudo systemctl stop docker
 ```
 
-### 3) Descargar la Imagen
+### 3) Descargar la imagen
 
-Ingresar al [Docker Hub](https://hub.docker.com/r/manuel313/cva6/tags) para ver cual es la tag de la imagen mas actualizada y luego descargarla:
+Ingresar a [Docker Hub](https://hub.docker.com/r/manuel313/cva6/tags) para ver cual es la tag de la imagen mas actualizada y luego descargarla (reemplazar `<tag>` por la tag deseada):
 
 ```bash
 docker pull manuel313/cva6:<tag>
@@ -94,7 +96,7 @@ docker images
 
 ### 4) Crear el Contenedor
 
-Crear un contenedor `container_name` que sera manipulado mediante una terminal bash y el cual tendra permisos para ejecutar aplicaciones de interfaz grafica:
+Crear un contenedor `container_name` que sera manipulado mediante una terminal bash y el cual tendra permisos para ejecutar aplicaciones de interfaz grafica (reemplazar `<tag>` por la tag de la imagen descargada y `<container_name>` por el nombre de contenedor deseado):
 
 ```bash
 docker run -it --name <container_name> -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix manuel313/cva6:<tag> bash
@@ -150,10 +152,10 @@ python3 cva6.py --target cv64a6_mmu --iss=$DV_SIMULATORS --iss_yaml=cva6.yaml \
 -I../tests/custom/env -I../tests/custom/common"
 ```
 
-Una vez finalizado se creara una carpeta `out_year-month-day` con los resultados del test. Para visualizar los resultados se puede correr el siguiente comando:
+Una vez finalizado se creara una carpeta `out_year-month-day` con los resultados del test. Para visualizar los resultados se puede correr el siguiente comando (reemplazando `<year-month-day>` por la fecha de la carpeta):
 
 ```bash
-cd out_year-month-day/veri-testharness_sim
+cd out_<year-month-day>/veri-testharness_sim
 gtkwave hello_world.cv64a6_mmu.vcd
 ```
 
@@ -168,9 +170,37 @@ gcc -Wall -Wextra -O3 -g -std=c99 -o program hello_world.c
 
 Tras haber probado el test `hello_world.c` con varias instrucciones de C, se observo que el procesador no soporta todas las instrucciones del lenguaje. Por ejemplo, no puede manipular numeros en punto flotante y tampoco puede realizar operaciones de memoria como `malloc` o `free`. Tampoco se ha logrado que el procesador corra por mas de 2 millones de ciclos sin que el simulador falle.
 
-## Crear/Actualizar Imagen de Docker
+## Crear Imagen Docker
 
-(TODO)
+En caso de querer crear una imagen de Docker con las herramientas basicas para trabajar con el procesador, se debe seguir los siguientes pasos.
+
+Primero, ubicarse en la carpeta raiz de este proyecto y correr el comando (reemplazando `<username>` y `<tag>` por los valores deseados): 
+
+```bash
+docker build -t <username>/cva6:<tag>
+```
+
+Luego crear un contenedor con esta nueva imagen. Para ello, seguir los pasos detallados en la seccion [Crear el Contenedor](#4-crear-el-contenedor) y [Iniciar/Cerrar el Contenedor](#5-iniciar/cerrar-el-contenedor). Una vez dentro del contenedor, se debe correr la secuencia de comandos:
+
+```bash
+source verif/sim/setup-env.sh
+export DV_SIMULATORS=veri-testharness
+bash verif/regress/smoke-tests.sh
+```
+
+Se recomienda ejecutar el test `hello_world.c` para verificar que todo este funcionando correctamente. En la seccion [Correr el primer Test](#correr-el-primer-test) se detallan los pasos a seguir.
+
+Por ultimo, se debe salir del contenedor y cerrarlo. Una vez apagado, se debe crear una nueva imagen a partir del contenedor modificado, corriendo el comando (reemplazando `<username>` y `<tag>` por los valores anteriores y `<container_name>` por el nombre del contenedor):
+
+```bash
+docker commit <container_name> <username>/cva6:<tag>
+```
+
+Verificar que la imagen se haya creado correctamente:
+
+```bash
+docker images
+```
 
 ## Crear Proyecto en Vivado
 
