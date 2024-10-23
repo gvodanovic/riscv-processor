@@ -143,7 +143,7 @@ source verif/sim/setup-env.sh
 cd ./verif/sim
 export DV_SIMULATORS=veri-testharness
 export TRACE_FAST=1
-python3 cva6.py --target cv64a6_mmu --iss=$DV_SIMULATORS --iss_yaml=cva6.yaml \
+python3 cva6.py --target cv64a6_imafdc_sv39 --iss=$DV_SIMULATORS --iss_yaml=cva6.yaml \
 --c_tests ../tests/custom/hello_world/hello_world.c \
 --linker=../tests/custom/common/test.ld \
 --gcc_opts="-static -mcmodel=medany -fvisibility=hidden -nostdlib \
@@ -156,7 +156,7 @@ Una vez finalizado se creara una carpeta `out_year-month-day` con los resultados
 
 ```bash
 cd out_<year-month-day>/veri-testharness_sim
-gtkwave hello_world.cv64a6_mmu.vcd
+gtkwave hello_world.cv64a6_imafdc_sv39.vcd
 ```
 
 Si se desea correr otro test, se debe cambiar el codigo `hello_world.c`. El mismo se encuentra en la carpeta `verif/tests/custom/hello_world`. Una vez modificado el codigo, se recomieda verificar que el mismo funcione correctamente antes de correr el test en el microprocesador:
