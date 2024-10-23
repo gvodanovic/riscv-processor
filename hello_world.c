@@ -3,8 +3,8 @@
 
 int main() {
 
-	const int n_iter = 10, t_amb = 25, fc_x = 4, fc_y = 4, N = 10;
-	int fc_temp = 60, sum, x[N*N], x_tmp[N*N];
+	const int n_iter = 10, fc_x = 4, fc_y = 4, N = 10;
+	float t_amb = 25.0, fc_temp = 60.5, sum, x[N*N], x_tmp[N*N];
 
 	for (int i = 0; i < N*N; ++i) {
 		x[i] = t_amb;

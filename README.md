@@ -166,9 +166,13 @@ gcc -Wall -Wextra -O3 -g -std=c99 -o program hello_world.c
 ./program
 ```
 
-### Observaciones
+### Limitaciones
 
-Tras haber probado el test `hello_world.c` con varias instrucciones de C, se observo que el procesador no soporta todas las instrucciones del lenguaje. Por ejemplo, no puede manipular numeros en punto flotante y tampoco puede realizar operaciones de memoria como `malloc` o `free`. Tampoco se ha logrado que el procesador corra por mas de 2 millones de ciclos sin que el simulador falle.
+Tras haber probado el test `hello_world.c` con varias instrucciones de C, se observo que el procesador no soporta todas las instrucciones del lenguaje:
+- `printf` no puede imprimir variables pero si strings. Por ejemplo, `printf("Hello World\n");` funciona correctamente mientras que `printf("%d\n", 5);` no.
+- Las unicas librerias que soporta son `stdio.h` y `stdint.h`.
+- No puede correr por mas de 2 millones de ciclos.
+
 
 ## Crear Imagen Docker
 
