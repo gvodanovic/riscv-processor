@@ -136,17 +136,17 @@ docker stop <container_name>
 
 ## Correr pruebas
 
-### Correr la primera prueba de C
+### Correr la primera prueba de Assembly
 
-Para verificar que todo esté funcionando correctamente, ejecutar un programa `hello_world.c` sobre el procesador CVA6. Dentro del contenedor correr los siguientes comandos:
+Para verificar que todo esté funcionando correctamente, se correrá una prueba de Assembly sobre el procesador CVA6. Dentro del contenedor, ejecutar los siguientes comandos:
 
 ```bash
 source verif/sim/setup-env.sh
 cd verif/sim
-export DV_SIMULATORS=veri-testharness
+export DV_SIMULATORS=veri-testharness,spike
 export TRACE_FAST=1
 python3 cva6.py --target cv64a6_imafdc_sv39 --iss=$DV_SIMULATORS --iss_yaml=cva6.yaml \
---c_tests ../tests/custom/hello_world/hello_world.c \
+--asm_tests ../tests/custom/hello_world/custom_test_template.S \
 --linker=../../config/gen_from_riscv_config/linker/link.ld \
 --gcc_opts="-static -mcmodel=medany -fvisibility=hidden -nostdlib \
 -nostartfiles -g ../tests/custom/common/syscalls.c \
@@ -158,16 +158,19 @@ Una vez finalizado se creará una carpeta `out_year-month-day` con los resultado
 
 ```bash
 cd out_<year-month-day>/veri-testharness_sim
-gtkwave hello_world.cv64a6_imafdc_sv39.vcd
+gtkwave custom_test_template.cv64a6_imafdc_sv39.vcd
 ```
 
-### Correr la primera prueba de Assembly
+### Correr la primera prueba de C
 
-Ahora se correrá una prueba de Assembly. Para ello, se debe ejecutar el siguiente comando dentro `/cva6/verif/sim`:
+Ahora se correrá una prueba de C para verificar que el entorno esté configurado correctamente. Desde la raíz del proyecto, ejecutar los siguientes comandos:
 
 ```bash
+source verif/sim/setup-env.sh
+cd verif/sim
+export DV_SIMULATORS=spike
 python3 cva6.py --target cv64a6_imafdc_sv39 --iss=$DV_SIMULATORS --iss_yaml=cva6.yaml \
---asm_tests ../tests/custom/hello_world/custom_test_template.S \
+--c_tests ../tests/custom/hello_world/hello_world.c \
 --linker=../../config/gen_from_riscv_config/linker/link.ld \
 --gcc_opts="-static -mcmodel=medany -fvisibility=hidden -nostdlib \
 -nostartfiles -g ../tests/custom/common/syscalls.c \
@@ -175,12 +178,7 @@ python3 cva6.py --target cv64a6_imafdc_sv39 --iss=$DV_SIMULATORS --iss_yaml=cva6
 -I../tests/custom/env -I../tests/custom/common"
 ```
 
-Una vez finalizado, los resultados se guardarán en una carpeta `out_year-month-day` similar a la de la prueba anterior. Para visualizar los resultados, correr el siguiente comando:
-
-```bash
-cd out_<year-month-day>/veri-testharness_sim
-gtkwave custom_test_template.cv64a6_imafdc_sv39.vcd
-```
+Una vez finalizado, los resultados se guardarán en una carpeta `out_year-month-day` similar a la prueba anterior.
 
 ### Correr programas en C
 
@@ -189,8 +187,7 @@ Para correr programas en C, se deben ejecutar los siguientes comandos desde la r
 ```bash
 source verif/sim/setup-env.sh
 cd verif/sim
-export DV_SIMULATORS=veri-testharness
-export TRACE_FAST=1
+export DV_SIMULATORS=spike
 python3 cva6.py --target cv64a6_imafdc_sv39 --iss=$DV_SIMULATORS --iss_yaml=cva6.yaml \
 --c_tests <path_to_file> \
 --linker=../../config/gen_from_riscv_config/linker/link.ld \
@@ -216,7 +213,7 @@ Para correr programas en Assembly, se deben ejecutar los siguientes comandos des
 ```bash
 source verif/sim/setup-env.sh
 cd verif/sim
-export DV_SIMULATORS=veri-testharness
+export DV_SIMULATORS=veri-testharness,spike
 export TRACE_FAST=1
 python3 cva6.py --target cv64a6_imafdc_sv39 --iss=$DV_SIMULATORS --iss_yaml=cva6.yaml \
 --asm_tests <path_to_file> \
@@ -229,12 +226,9 @@ python3 cva6.py --target cv64a6_imafdc_sv39 --iss=$DV_SIMULATORS --iss_yaml=cva6
 
 Una vez finalizado, los resultados se guardarán en una carpeta `out_year-month-day` similar a las pruebas anteriores.
 
-## Limitaciones del Procesador
+### Consideraciones
 
-Tras varias pruebas con distintas instrucciones de C, se observó que el procesador no soporta todas las instrucciones del lenguaje:
-- `printf` no puede imprimir variables pero sí strings. Por ejemplo, `printf("Hello World\n");` funciona correctamente mientras que `printf("%d\n", 5);` no.
-- Las únicas librerías que soporta son `stdio.h` y `stdint.h`.
-- No puede correr por más de 2 millones de ciclos.
+A la hora de correr programas en C, se recomienda utilizar como simulador solamente a `spike` ya que `veri-testharness` no soporta todas las instrucciones de C. Lastimosamente, `spike` no soporta la generación de archivos `.vcd` para visualizar los resultados en `gtkwave`. También cabe destacar que las únicas librerías soportadas son `stdio.h`, `stdint.h` y `string.h`.
 
 ## Crear Imagen Docker
 
