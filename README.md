@@ -168,42 +168,23 @@ Ahora se correrá una prueba de C para verificar que el entorno esté configurad
 ```bash
 source verif/sim/setup-env.sh
 cd verif/sim
-export DV_SIMULATORS=spike
+export DV_SIMULATORS=veri-testharness,spike
+export TRACE_FAST=1
 python3 cva6.py --target cv64a6_imafdc_sv39 --iss=$DV_SIMULATORS --iss_yaml=cva6.yaml \
 --c_tests ../tests/custom/hello_world/hello_world.c \
 --linker=../../config/gen_from_riscv_config/linker/link.ld \
 --gcc_opts="-static -mcmodel=medany -fvisibility=hidden -nostdlib \
 -nostartfiles -g ../tests/custom/common/syscalls.c \
 ../tests/custom/common/crt.S -lgcc \
--I../tests/custom/env -I../tests/custom/common"
+-I../tests/custom/env -I../tests/custom/common" \
+--issrun_opts="+exit_on_to_host=1"
 ```
 
-Una vez finalizado, los resultados se guardarán en una carpeta `out_year-month-day` similar a la prueba anterior.
-
-### Correr programas en C
-
-Para correr programas en C, se deben ejecutar los siguientes comandos desde la raíz (donde `<path_to_file>` es la ruta al archivo `.c` que se desea correr):
+Una vez finalizado, se creará una carpeta `out_year-month-day` con los resultados de la prueba. Para visualizar los resultados se puede correr el siguiente comando (reemplazando `<year-month-day>` por la fecha de la carpeta):
 
 ```bash
-source verif/sim/setup-env.sh
-cd verif/sim
-export DV_SIMULATORS=spike
-python3 cva6.py --target cv64a6_imafdc_sv39 --iss=$DV_SIMULATORS --iss_yaml=cva6.yaml \
---c_tests <path_to_file> \
---linker=../../config/gen_from_riscv_config/linker/link.ld \
---gcc_opts="-static -mcmodel=medany -fvisibility=hidden -nostdlib \
--nostartfiles -g ../tests/custom/common/syscalls.c \
-../tests/custom/common/crt.S -lgcc \
--I../tests/custom/env -I../tests/custom/common"
-```
-
-Una vez finalizado, los resultados se guardarán en una carpeta `out_year-month-day` similar a las pruebas anteriores.
-
-Se recomienda compilar el programa en C antes de correrlo. Para ello, se puede utilizar el siguiente comando (reemplazando `<program_name>` por el nombre del archivo `.c`):
-
-```bash
-gcc -Wall -Wextra -O3 -g -std=c99 -o <executable_name> <program_name>
-./<executable_name>
+cd out_<year-month-day>/veri-testharness_sim
+gtkwave hello_world.cv64a6_imafdc_sv39.vcd
 ```
 
 ### Correr programas en Assembly
@@ -226,9 +207,46 @@ python3 cva6.py --target cv64a6_imafdc_sv39 --iss=$DV_SIMULATORS --iss_yaml=cva6
 
 Una vez finalizado, los resultados se guardarán en una carpeta `out_year-month-day` similar a las pruebas anteriores.
 
+### Correr programas en C
+
+Para correr programas en C, se deben ejecutar los siguientes comandos desde la raíz (donde `<path_to_file>` es la ruta al archivo `.c` que se desea correr):
+
+```bash
+source verif/sim/setup-env.sh
+cd verif/sim
+export DV_SIMULATORS=veri-testharness,spike
+export TRACE_FAST=1
+python3 cva6.py --target cv64a6_imafdc_sv39 --iss=$DV_SIMULATORS --iss_yaml=cva6.yaml \
+--c_tests <path_to_file> \
+--linker=../../config/gen_from_riscv_config/linker/link.ld \
+--gcc_opts="-static -mcmodel=medany -fvisibility=hidden -nostdlib \
+-nostartfiles -g ../tests/custom/common/syscalls.c \
+../tests/custom/common/crt.S -lgcc \
+-I../tests/custom/env -I../tests/custom/common" \
+--issrun_opts="+exit_on_to_host=1"
+```
+
+Una vez finalizado, los resultados se guardarán en una carpeta `out_year-month-day` similar a las pruebas anteriores.
+
+Se recomienda compilar el programa en C antes de correrlo. Para ello, se puede utilizar el siguiente comando (reemplazando `<program_name>` por el nombre del archivo `.c` y `<executable_name>` por el nombre del ejecutable que se desea crear):
+
+```bash
+gcc -Wall -Wextra -O3 -g -std=c99 -o <executable_name> <program_name>
+./<executable_name>
+```
+
 ### Consideraciones
 
-A la hora de correr programas en C, se recomienda utilizar como simulador solamente a `spike` ya que `veri-testharness` no soporta todas las instrucciones de C. Lastimosamente, `spike` no soporta la generación de archivos `.vcd` para visualizar los resultados en `gtkwave`. También cabe destacar que las únicas librerías soportadas son `stdio.h`, `stdint.h` y `string.h`.
+A la hora de escribir programas en C tener en cuenta lo siguiente:
+- Solo estan disponibles las librerías `stdio.h`, `stdint.h` y `string.h`.
+- No se pueden imprimir `floats` ni `doubles`.
+- No se pueden usar las funciones `malloc` ni `free`.
+
+Si se usa el simulador `veri-testharness`, se debe tener en cuenta que:
+- El procesador solo puede correr por 2 millones de ciclos o 500 segundos, lo que ocurra primero.
+
+Si se usa el simulador `spike`, se debe tener en cuenta que:
+- No se generan archivos `.vcd` para visualizar las señales.
 
 ## Crear Imagen Docker
 
