@@ -9,5 +9,10 @@
 - **Plataforma de validación obsoleta**: La FPGA Kintex-7 operando a 50 MHz utilizada para validación es un modelo antiguo que no refleja las frecuencias reales de operación del CVA6 en implementaciones actuales.
 
 ## Benchmarks utilizados en el estudio IEEE
-- **Micro-benchmarks**: Suite de validación RISC-V ([enlace](https://github.com/darchr/riscv-validation))
-- **MiBench**: Conjunto de benchmarks para sistemas embebidos ([enlace](https://github.com/darchr/riscv-validation))
+- **Micro-benchmarks**: Suite de validación RISC-V ([RISCV-Validation](https://github.com/darchr/riscv-validation))
+- **MiBench**: Conjunto de benchmarks para sistemas embebidos ([MiBench](https://github.com/embecosm/mibench))
+
+## Lectura Complementaria
+- [gem5-based evaluation of CVA6 SoC](https://10xengineers.ai/wp-content/uploads/Gem5-Based-Evaluation-of-CVA6-SoC_-Insights-into-the-Architectural-Design.pdf)
+- [A gem5-based CVA6 Framework for Microarchitectural Pathfinding](https://riscv-europe.org/summit/2023/media/proceedings/posters/2023-06-06-Pierre-RAVENEL-abstract.pdf)
+- [Implementation and Performance Evaluation of Bit Manipulation Extension on CVA6 RISC-V](https://10xengineers.ai/implementation-and-performance-evaluation-of-bit-manipulation-extension-on-cva6-risc-v/)
